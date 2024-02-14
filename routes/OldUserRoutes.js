@@ -3,18 +3,18 @@ const express = require("express");
 const router = express.Router();
 const OldUser = require("../models/OldUser");
 
-// Controller logic for creating a volunteer
-router.post("/", async (req, res) => {
+// Controller logic for creating an oldUser
+router.post("/", createUser = (req, res) => {
   try {
     const oldUser = new OldUser(req.body);
-    await oldUser.save();
+    oldUser.save();
     res.status(201).send(oldUser);
   } catch (err) {
     res.status(400).send(err);
   }
 });
 
-// Controller logic for getting all volunteers
+// Controller logic for getting all oldUsers
 router.get("/", async (req, res) => {
   try {
     const oldUsers = await OldUser.find();
@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Route to update a volunteer user by ID
+// Route to update an oldUser user by ID
 router.patch("/oldUser/:id", async (req, res) => {
   try {
     const oldUser = await OldUser.findByIdAndUpdate(req.params.id, req.body, {
@@ -39,7 +39,7 @@ router.patch("/oldUser/:id", async (req, res) => {
   }
 });
 
-// Route to delete a volunteer user by ID
+// Route to delete an oldUser user by ID
 router.delete("/:id", async (req, res) => {
   try {
     const oldUser = await OldUser.findByIdAndDelete(req.params.id);
@@ -52,7 +52,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// Route to get a specific volunteer user by ID
+// Route to get a specific oldUser user by ID
 router.get("/oldUser/:id", async (req, res) => {
   try {
     const oldUser = await OldUser.findById(req.params.id);

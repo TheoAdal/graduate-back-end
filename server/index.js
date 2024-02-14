@@ -1,27 +1,36 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const adminRoutes = require("../routes/AdminRoutes"); //Routes
-// const managerRoutes = require('./routes/ManagementRoutes');
-const volunteerRoutes = require("../routes/VolunteerRoutes");
-// const oldUserRoutes = require('./routes/OldUserRoutes');
-
-// Connect to MongoDB database
-mongoose
-  .connect("mongodb://localhost/graduate_db", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
-
-// Create Express app
+const cors = require("cors");
 const app = express();
+const dotenv = require("dotenv");
+const connectDB = require("../DbConfig.js");
+
+//Routes
+// const adminRoutes = require("../routes/AdminRoutes");
+const managerRoutes = require('../routes/ManagementRoutes');
+const volunteerRoutes = require("../routes/VolunteerRoutes");
+const oldUserRoutes = require("../routes/OldUserRoutes");
+
+connectDB;
+dotenv.config();
+app.use(express.json());
+
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+  })
+);
 
 // Routes and controllers
-app.use('/volunteers', volunteerRoutes);
 // app.use('/admins', adminRoutes);
-// app.use('/managers', managerRoutes);
-// app.use('/oldUsers', oldUserRoutes);
+app.use('/managers', managerRoutes);
+app.use("/volunteers", volunteerRoutes);
+app.use("/olduser", oldUserRoutes);
+
+app.get("/", (_req, res) => {
+  res.send("<h1>VRWMAAAAAAAA</h1>");
+});
 
 // Start the server
 const PORT = process.env.PORT || 5000;

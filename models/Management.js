@@ -1,11 +1,11 @@
 // models/Management.js
 const mongoose = require('mongoose');
 
-const adminSchema = new mongoose.Schema({
+const ManagementSchema = new mongoose.Schema({
   name: String,
-  email: String,
-  password: String,
-  // Admin-specific properties
+  // email: String,
+  // password: String,
+  // Management-specific properties
 });
 
-module.exports = mongoose.model('Management', managementSchema);
+module.exports = mongoose.model('Management', ManagementSchema);

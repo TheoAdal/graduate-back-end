@@ -4,15 +4,25 @@ const router = express.Router();
 const Volunteer = require("../models/Volunteer");
 
 // Controller logic for creating a volunteer
-router.post("/", async (req, res) => {
+router.post("/", createUser = (req, res) => {
   try {
     const volunteer = new Volunteer(req.body);
-    await volunteer.save();
+    volunteer.save();
     res.status(201).send(volunteer);
   } catch (err) {
     res.status(400).send(err);
   }
 });
+
+// router.post("/volunteers", async (req, res) => {
+//   try {
+//     const volunteer = new Volunteer(req.body);
+//     await volunteer.save();
+//     res.status(201).send(volunteer);
+//   } catch (err) {
+//     res.status(400).send(err);
+//   }
+// });
 
 // Controller logic for getting all volunteers
 router.get("/", async (req, res) => {
@@ -23,6 +33,8 @@ router.get("/", async (req, res) => {
     res.status(500).send(err);
   }
 });
+
+
 
 // Route to update a volunteer user by ID
 router.patch("/volunteers/:id", async (req, res) => {

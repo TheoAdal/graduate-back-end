@@ -1,26 +1,30 @@
+const dotenv = require("dotenv");
+dotenv.config();
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.tfj07bt.mongodb.net/?retryWrites=true&w=majority`;
+const mongoose = require("mongoose");
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
+function connectDB() {
+  const url = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.tfj07bt.mongodb.net/?retryWrites=true&w=majority`;
 
-async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+    mongoose.connect(url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
   }
+
+  const dbConnection = mongoose.connection;
+  dbConnection.once("open", (_) => {
+    console.log(`Database connected: ${url}`);
+  });
+
+  dbConnection.on("error", (err) => {
+    console.error(`connection error: ${err}`);
+  });
+  return;
 }
-run().catch(console.dir);
+
+connectDB();
