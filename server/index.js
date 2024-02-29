@@ -22,6 +22,12 @@ app.use(
   })
 );
 
+app.use('/login', (req, res) => {
+  res.send({
+    token: 'test123'
+  });
+});
+
 // Routes and controllers
 // app.use('/admins', adminRoutes);
 app.use('/managers', managerRoutes);
