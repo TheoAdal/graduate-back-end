@@ -3,8 +3,31 @@ const express = require("express");
 const router = express.Router();
 const Volunteer = require("../models/Volunteer");
 
-// Controller logic for creating a volunteer
-router.post("/", createUser = (req, res) => {
+// Controller logic for getting all volunteers //WORKS
+router.get("/getall", async (req, res) => {
+  try {
+    const volunteers = await Volunteer.find();
+    res.send(volunteers);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// Route to get a specific volunteer user by ID //WORKS
+router.get("/get/:id", async (req, res) => {
+  try {
+    const volunteer = await Volunteer.findById(req.params.id);
+    if (!volunteer) {
+      return res.status(404).send("Volunteer not found");
+    }
+    res.send(volunteer);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// Controller logic for creating a volunteer //WORKS 
+router.post("/post", createUser = (req, res) => {
   try {
     const volunteer = new Volunteer(req.body);
     volunteer.save();
@@ -14,30 +37,8 @@ router.post("/", createUser = (req, res) => {
   }
 });
 
-// router.post("/volunteers", async (req, res) => {
-//   try {
-//     const volunteer = new Volunteer(req.body);
-//     await volunteer.save();
-//     res.status(201).send(volunteer);
-//   } catch (err) {
-//     res.status(400).send(err);
-//   }
-// });
-
-// Controller logic for getting all volunteers
-router.get("/", async (req, res) => {
-  try {
-    const volunteers = await Volunteer.find();
-    res.send(volunteers);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
-
-
-
-// Route to update a volunteer user by ID
-router.patch("/volunteers/:id", async (req, res) => {
+// Route to update a volunteer user by ID //WORKS
+router.patch("/patch/:id", async (req, res) => {
   try {
     const volunteer = await Volunteer.findByIdAndUpdate(
       req.params.id,
@@ -53,23 +54,10 @@ router.patch("/volunteers/:id", async (req, res) => {
   }
 });
 
-// Route to delete a volunteer user by ID
-router.delete("/volunteers/:id", async (req, res) => {
+// Route to delete a volunteer user by ID //WORKS
+router.delete("/delete/:id", async (req, res) => {
   try {
     const volunteer = await Volunteer.findByIdAndDelete(req.params.id);
-    if (!volunteer) {
-      return res.status(404).send("Volunteer not found");
-    }
-    res.send(volunteer);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
-
-// Route to get a specific volunteer user by ID
-router.get("/volunteers/:id", async (req, res) => {
-  try {
-    const volunteer = await Volunteer.findById(req.params.id);
     if (!volunteer) {
       return res.status(404).send("Volunteer not found");
     }

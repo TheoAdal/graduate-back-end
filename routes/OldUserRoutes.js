@@ -3,8 +3,31 @@ const express = require("express");
 const router = express.Router();
 const OldUser = require("../models/OldUser");
 
+// Controller logic for getting all oldUsers
+router.get("/getall", async (req, res) => {
+  try {
+    const oldUsers = await OldUser.find();
+    res.send(oldUsers);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// Route to get a specific oldUser user by ID
+router.get("/get/:id", async (req, res) => {
+  try {
+    const oldUser = await OldUser.findById(req.params.id);
+    if (!oldUser) {
+      return res.status(404).send("Old user not found");
+    }
+    res.send(oldUser);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 // Controller logic for creating an oldUser
-router.post("/", createUser = (req, res) => {
+router.post("/post", createUser = (req, res) => {
   try {
     const oldUser = new OldUser(req.body);
     oldUser.save();
@@ -14,18 +37,8 @@ router.post("/", createUser = (req, res) => {
   }
 });
 
-// Controller logic for getting all oldUsers
-router.get("/", async (req, res) => {
-  try {
-    const oldUsers = await OldUser.find();
-    res.send(oldUsers);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
-
 // Route to update an oldUser user by ID
-router.patch("/oldUser/:id", async (req, res) => {
+router.patch("/patch/:id", async (req, res) => {
   try {
     const oldUser = await OldUser.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -40,7 +53,7 @@ router.patch("/oldUser/:id", async (req, res) => {
 });
 
 // Route to delete an oldUser user by ID
-router.delete("/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     const oldUser = await OldUser.findByIdAndDelete(req.params.id);
     if (!oldUser) {
@@ -52,17 +65,6 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// Route to get a specific oldUser user by ID
-router.get("/oldUser/:id", async (req, res) => {
-  try {
-    const oldUser = await OldUser.findById(req.params.id);
-    if (!oldUser) {
-      return res.status(404).send("Old user not found");
-    }
-    res.send(oldUser);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
+// Define more routes as needed
 
 module.exports = router;

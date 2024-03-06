@@ -7,7 +7,7 @@ const connectDB = require("../DbConfig.js");
 
 //Routes
 // const adminRoutes = require("../routes/AdminRoutes");
-const managerRoutes = require('../routes/ManagementRoutes');
+const managerRoutes = require("../routes/ManagementRoutes");
 const volunteerRoutes = require("../routes/VolunteerRoutes");
 const oldUserRoutes = require("../routes/OldUserRoutes");
 
@@ -22,15 +22,15 @@ app.use(
   })
 );
 
-app.use('/login', (req, res) => {
+app.use("/login", (req, res) => {
   res.send({
-    token: 'test123'
+    token: "test123",
   });
 });
 
 // Routes and controllers
 // app.use('/admins', adminRoutes);
-app.use('/managers', managerRoutes);
+app.use("/managers", managerRoutes);
 app.use("/volunteers", volunteerRoutes);
 app.use("/olduser", oldUserRoutes);
 
