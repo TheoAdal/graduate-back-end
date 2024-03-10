@@ -13,7 +13,7 @@ router.get("/getall", async (req, res) => {
   }
 });
 
-// Route to get a specific volunteer user by ID //WORKS
+// Route to get a specific volunteer user by ID //WORKS 
 router.get("/get/:id", async (req, res) => {
   try {
     const volunteer = await Volunteer.findById(req.params.id);
@@ -27,13 +27,15 @@ router.get("/get/:id", async (req, res) => {
 });
 
 // Controller logic for creating a volunteer //WORKS 
-router.post("/post", createUser = (req, res) => {
+router.post("/register", createUser = (req, res) => {
   try {
-    const volunteer = new Volunteer(req.body);
+    const { name, surname, email, mobile, country, city, password } = req.body;
+    const volunteer = new Volunteer({ name, surname, email, mobile, country, city, password });
     volunteer.save();
     res.status(201).send(volunteer);
   } catch (err) {
-    res.status(400).send(err);
+    console.error("Error registering volunteer:", err);
+    res.status(500).send("Internal Server Error");
   }
 });
 

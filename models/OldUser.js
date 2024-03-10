@@ -14,7 +14,7 @@ const oldUserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  phone: {
+  mobile: {
     type: String,
     required: true
   },
@@ -25,7 +25,11 @@ const oldUserSchema = new mongoose.Schema({
   city: {
     type: String,
     required: true
-  }
+  },
+  password: {
+    type: String,
+    required: true
+  },
   // password: String,
   // OldUser-specific properties
 });

@@ -14,7 +14,7 @@ const volunteerSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  phone: {
+  mobile: {
     type: String,
     required: true
   },
@@ -25,9 +25,15 @@ const volunteerSchema = new mongoose.Schema({
   city: {
     type: String,
     required: true
-  }
-  // password: String,
-  // Volunteer-specific properties
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  // confirmPassword: {
+  //   type: String,
+  //   required: true
+  // }
 });
 
 module.exports = mongoose.model('Volunteer', volunteerSchema);

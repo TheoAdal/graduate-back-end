@@ -27,13 +27,15 @@ router.get("/get/:id", async (req, res) => {
 });
 
 // Controller logic for creating an oldUser
-router.post("/post", createUser = (req, res) => {
+router.post("/register", createUser = (req, res) => {
   try {
-    const oldUser = new OldUser(req.body);
+    const { name, surname, email, mobile, country, city, password } = req.body;
+    const oldUser = new OldUser({ name, surname, email, mobile, country, city, password });
     oldUser.save();
     res.status(201).send(oldUser);
   } catch (err) {
-    res.status(400).send(err);
+    console.error("Error registering volunteer:", err);
+    res.status(500).send("Internal Server Error");
   }
 });
 

@@ -27,24 +27,25 @@ router.get("/get/:id", async (req, res) => {
 });
 
 // Controller logic for creating a manager
-router.post("/post", createUser = (req, res) => {
-  try {
-    const manager = new Manager(req.body);
-    manager.save();
-    res.status(201).send(manager);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
+router.post(
+  "/register",
+  (createUser = (req, res) => {
+    try {
+      const manager = new Manager(req.body);
+      manager.save();
+      res.status(201).send(manager);
+    } catch (err) {
+      res.status(400).send(err);
+    }
+  })
+);
 
 // Route to update a manager user by ID
 router.patch("/patch/:id", async (req, res) => {
   try {
-    const manager = await Manager.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const manager = await Manager.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     if (!manager) {
       return res.status(404).send("Manager not found");
     }
