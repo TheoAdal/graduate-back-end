@@ -13,7 +13,7 @@ router.get("/getall", async (req, res) => {
   }
 });
 
-// Route to get a specific volunteer user by ID //WORKS 
+// Route to get a specific volunteer user by ID //WORKS
 router.get("/get/:id", async (req, res) => {
   try {
     const volunteer = await Volunteer.findById(req.params.id);
@@ -26,18 +26,29 @@ router.get("/get/:id", async (req, res) => {
   }
 });
 
-// Controller logic for creating a volunteer //WORKS 
-router.post("/register", createUser = (req, res) => {
+// Controller logic for creating a volunteer //WORKS
+router.post("/register", async (req, res) => {
   try {
-    const { name, surname, email, mobile, country, city, password } = req.body;
-    const volunteer = new Volunteer({ name, surname, email, mobile, country, city, password });
-    volunteer.save();
+    const { name, surname, email, mobile, country, city, password  } = req.body;
+    const role = "volunteer"; // Set the role field to "volunteer"
+
+    // Check if email already exists
+    const existingVolunteer = await Volunteer.findOne({ email });
+    if (existingVolunteer) {
+      return res.status(400).send("Email address already exists");
+    }
+
+    // Create new volunteer if email is unique + the role
+    const volunteer = new Volunteer({ name, surname, email, mobile, country, city, password, role });
+    await volunteer.save();
+    
     res.status(201).send(volunteer);
   } catch (err) {
     console.error("Error registering volunteer:", err);
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 // Route to update a volunteer user by ID //WORKS
 router.patch("/patch/:id", async (req, res) => {

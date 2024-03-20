@@ -30,8 +30,10 @@ const oldUserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  // password: String,
-  // OldUser-specific properties
 });
 
-module.exports = mongoose.model('OldUser', oldUserSchema);
+const OldUser = mongoose.model('OldUser', oldUserSchema)
+
+module.exports = OldUser;
+
+// module.exports = mongoose.model('OldUser', oldUserSchema);

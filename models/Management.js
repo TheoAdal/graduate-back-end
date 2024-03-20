@@ -1,7 +1,7 @@
 // models/Management.js
 const mongoose = require('mongoose');
 
-const ManagementSchema = new mongoose.Schema({
+const managementSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -30,4 +30,10 @@ const ManagementSchema = new mongoose.Schema({
   // Management-specific properties
 });
 
-module.exports = mongoose.model('Management', ManagementSchema);
+const Management = mongoose.model('Management', managementSchema);
+
+module.exports = Management;
+
+
+
+// module.exports = mongoose.model('Management', ManagementSchema);

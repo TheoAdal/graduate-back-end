@@ -1,8 +1,8 @@
-// models/Volunteer.js
+// models/User.js
 const mongoose = require('mongoose');
 
 
-const volunteerSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -34,11 +34,25 @@ const volunteerSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true
-  }
+  },
+  tokens: [
+    {
+      token: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
 
 });
 
-const Volunteer = mongoose.model('Volunteer', volunteerSchema);
+userSchema.methods.verifyPassword = async function (password) {
+  const user = this;
+  const isMatch = await bcrypt.compare(password, user.password);
+  return isMatch;
+};
 
-module.exports = Volunteer;
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
 
