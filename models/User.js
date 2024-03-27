@@ -40,19 +40,23 @@ const userSchema = new mongoose.Schema({
   },
   nid: {
     type: String,
-    required: true
+    required: false
   },
   dateofbirth: {
     type: Date,
-    required: true
+    required: false
   },
   gender: {
     type: String,
     required: true
   },
+  userState: {
+    type: String,
+    required: false
+  },
   medpapers: {
     // type: String,
-    // required: true
+    // required: false
     fileId: mongoose.Schema.Types.ObjectId, // Store GridFS file ID
     filename: String, // Store original filename
     contentType: String, // Store content type (e.g., image/jpeg)

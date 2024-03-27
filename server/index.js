@@ -30,24 +30,27 @@ app.use(
   })
 );
 
+//FOR CREATING LOGIN AUTHENTICATION
+//https://medium.com/@simonsruggi/how-to-implement-jwt-authentication-with-react-and-node-js-5d8bf3e718d0
+    
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
 
   if (!user) 
-    return res.status(400).send("Invalid email.");
+    return res.status(400).send("Invalid email or password.");
 
   const validPassword = await bcrypt.compare(password, user.password);
 
   if (!validPassword)
-    return res.status(400).send("Invalid password.");
+    return res.status(400).send("Invalid email or password.");
 
-  const role = user.role;
-  const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
+    const { _id, name, surname, role } = user;
+    const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
 
-  //send role + token to frontend
-  res.send({ role, token });
+  //send role + name + surname + token + _id to frontend
+  res.send({ token, _id, name, surname, role });
 });
 
 
