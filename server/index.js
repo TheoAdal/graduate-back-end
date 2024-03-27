@@ -2,9 +2,11 @@ const dotenv = require("dotenv");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const router = express.Router();
 const app = express();
 const connectDB = require("../DbConfig.js");
 const User = require("../models/User");
+const Visits = require("../models/Visits");
 
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
@@ -28,29 +30,27 @@ app.use(
   })
 );
 
-// app.post("/login", async (req, res) => {
-//   const { email, password } = req.body;
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
-//   const user = await User.findOne({ email });
+  const user = await User.findOne({ email });
 
-//   if (!user) return res.status(400).send("Invalid email or password.");
+  if (!user) 
+    return res.status(400).send("Invalid email.");
 
-//   const validPassword = await bcrypt.compare(password, user.password);
+  const validPassword = await bcrypt.compare(password, user.password);
 
-//   if (!validPassword)
-//     return res.status(400).send("Invalid username or password.");
+  if (!validPassword)
+    return res.status(400).send("Invalid password.");
 
-//      //send role to frontend
-//      res.send({ token, role: user.role });
+  const role = user.role;
+  const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
 
-//   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
-
-//   res.send({ token });
-// });
-
-app.post("/login", (req, res) => {
-  res.send({token: "test123",});
+  //send role + token to frontend
+  res.send({ role, token });
 });
+
+
 
 // Routes and controllers
 app.use('/users', userRoutes);
