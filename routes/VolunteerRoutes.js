@@ -1,80 +1,160 @@
 // routes/VolunteerRoutes.js
 const express = require("express");
 const router = express.Router();
-const Volunteer = require("../models/Volunteer");
+const User = require("../models/User");
 
 // Controller logic for getting all volunteers //WORKS
-router.get("/getall", async (req, res) => {
+router.get("/getallvol", async (req, res) => {
   try {
-    const volunteers = await Volunteer.find();
-    res.send(volunteers);
+    const users = await User.find({ role: "volunteer" });
+    res.send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+// Controller logic for getting all active volunteers //WORKS
+router.get("/getallactivevol", async (req, res) => {
+  try {
+    const users = await User.find({ role: "volunteer", userState: "active" });
+    res.send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+// Controller logic for getting all inactive volunteers //WORKS
+router.get("/getallinactivevol", async (req, res) => {
+  try {
+    const users = await User.find({ role: "volunteer", userState: "inactive" });
+    res.send(users);
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-// Route to get a specific volunteer user by ID //WORKS
+// Route to get a specific user by ID //WORKS
 router.get("/get/:id", async (req, res) => {
   try {
-    const volunteer = await Volunteer.findById(req.params.id);
-    if (!volunteer) {
-      return res.status(404).send("Volunteer not found");
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send("User not found");
     }
-    res.send(volunteer);
+    res.send(user);
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
 // Controller logic for creating a volunteer //WORKS
-router.post("/register", async (req, res) => {
+router.post("/registervolunteer", async (req, res) => {
   try {
-    const { name, surname, email, mobile, country, city, password  } = req.body;
+    const {
+      name,
+      surname,
+      email,
+      mobile,
+      gender,
+      dateofbirth,
+      nid,
+      country,
+      city,
+      password,
+    } = req.body;
     const role = "volunteer"; // Set the role field to "volunteer"
+    const userState = "inactive"; // Set the userState to "inactive"
 
     // Check if email already exists
-    const existingVolunteer = await Volunteer.findOne({ email });
-    if (existingVolunteer) {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.status(400).send("Email address already exists");
     }
 
-    // Create new volunteer if email is unique + the role
-    const volunteer = new Volunteer({ name, surname, email, mobile, country, city, password, role });
-    await volunteer.save();
-    
-    res.status(201).send(volunteer);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create new user if email is unique + role + userState
+    const user = new User({
+      name,
+      surname,
+      email,
+      mobile,
+      gender,
+      dateofbirth,
+      nid,
+      country,
+      city,
+      password: hashedPassword,
+      role,
+      userState,
+    });
+    await user.save();
+
+    res.status(201).send(user);
   } catch (err) {
-    console.error("Error registering volunteer:", err);
+    console.error("Error registering user(volunteer):", err);
     res.status(500).send("Internal Server Error");
   }
 });
 
-
-// Route to update a volunteer user by ID //WORKS
+// Route to update a user by ID //WORKS
 router.patch("/patch/:id", async (req, res) => {
   try {
-    const volunteer = await Volunteer.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!volunteer) {
-      return res.status(404).send("Volunteer not found");
+    // Find the user by ID
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send("User not found");
     }
-    res.send(volunteer);
+
+    // Update user fields with the ones provided in the request body
+    Object.assign(user, req.body);
+
+    // Save the updated user
+    await user.save();
+
+    // Respond with the updated user
+    res.send(user);
   } catch (err) {
-    res.status(400).send(err);
+    console.error("Error updating user:", err);
+    res.status(500).send("Internal server error");
   }
 });
 
-// Route to delete a volunteer user by ID //WORKS
+router.patch("/changeState/:id", async (req, res) => {
+  try {
+    // Find the user by ID
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    let userState = user.userState;
+
+    //if userState empty, set to "active"
+    if (!userState) {
+      userState = "active";
+    } else {
+      //Update userState from inactive to active and vice versa
+      user.userState = userState === "inactive" ? "active" : "inactive";
+    }
+
+    // Save the updated user
+    await user.save();
+
+    // Respond with the updated user
+    res.send(user);
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).send("Internal server error");
+  }
+});
+
+// Route to delete a user by ID //WORKS
 router.delete("/delete/:id", async (req, res) => {
   try {
-    const volunteer = await Volunteer.findByIdAndDelete(req.params.id);
-    if (!volunteer) {
-      return res.status(404).send("Volunteer not found");
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return res.status(404).send("User not found");
     }
-    res.send(volunteer);
+    res.send(user);
   } catch (err) {
     res.status(500).send(err);
   }

@@ -42,4 +42,5 @@ const visitSchema = new mongoose.Schema({
 
 const Visits = mongoose.model("Visits", visitSchema);
 
+
 module.exports = Visits;

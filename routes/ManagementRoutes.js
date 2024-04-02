@@ -3,68 +3,63 @@ const express = require("express");
 const router = express.Router();
 const Manager = require("../models/Management");
 
-// Controller logic for getting all managers
-router.get("/getall", async (req, res) => {
+// Controller logic for getting all users
+router.get("/getallmanagers", async (req, res) => {
+  //DOES NOT WORK YET
   try {
-    const managers = await Manager.find();
-    res.send(managers);
+    const users = await User.find({ role: "manager" });
+    res.send(users);
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-// Route to get a specific manager user by ID
-router.get("/get/:id", async (req, res) => {
+// Controller logic for creating an olduser //WORKS
+router.post("/registermanager", async (req, res) => {
   try {
-    const manager = await Manager.findById(req.params.id);
-    if (!manager) {
-      return res.status(404).send("Manager not found");
-    }
-    res.send(manager);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
+    const {
+      name,
+      surname,
+      email,
+      mobile,
+      gender,
+      dateofbirth,
+      nid,
+      country,
+      city,
+      password,
+    } = req.body;
+    const role = "manager"; // Set the role field to "manager"
 
-// Controller logic for creating a manager
-router.post(
-  "/register",
-  (createUser = (req, res) => {
-    try {
-      const manager = new Manager(req.body);
-      manager.save();
-      res.status(201).send(manager);
-    } catch (err) {
-      res.status(400).send(err);
+    // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).send("Email address already exists");
     }
-  })
-);
 
-// Route to update a manager user by ID
-router.patch("/patch/:id", async (req, res) => {
-  try {
-    const manager = await Manager.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create new user if email is unique + the role
+    const user = new User({
+      name,
+      surname,
+      email,
+      mobile,
+      gender,
+      dateofbirth,
+      nid,
+      country,
+      city,
+      password: hashedPassword,
+      role,
     });
-    if (!manager) {
-      return res.status(404).send("Manager not found");
-    }
-    res.send(manager);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
+    await user.save();
 
-// Route to delete a manager user by ID
-router.delete("/delete/:id", async (req, res) => {
-  try {
-    const manager = await Manager.findByIdAndDelete(req.params.id);
-    if (!manager) {
-      return res.status(404).send("Manager not found");
-    }
-    res.send(manager);
+    res.status(201).send(user);
   } catch (err) {
-    res.status(500).send(err);
+    console.error("Error registering user(manager):", err);
+    res.status(500).send("Internal Server Error");
   }
 });
 

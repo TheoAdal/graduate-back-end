@@ -1,69 +1,84 @@
 // routes/OldUserRoutes.js
 const express = require("express");
 const router = express.Router();
-const OldUser = require("../models/OldUser");
+const User = require("../models/User");
 
-// Controller logic for getting all oldUsers
-router.get("/getall", async (req, res) => {
+// Controller logic for getting all users //WORKS
+router.get("/getalloldusers", async (req, res) => {
   try {
-    const oldUsers = await OldUser.find();
-    res.send(oldUsers);
+    const users = await User.find({ role: "olduser" });
+    res.send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+// Controller logic for getting all active oldusers //WORKS
+router.get("/getallactiveold", async (req, res) => {
+  try {
+    const users = await User.find({ role: "olduser", userState: "active" });
+    res.send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+// Controller logic for getting all inactive oldusers //WORKS
+router.get("/getallinactiveold", async (req, res) => {
+  try {
+    const users = await User.find({ role: "olduser", userState: "inactive" });
+    res.send(users);
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-// Route to get a specific oldUser user by ID
-router.get("/get/:id", async (req, res) => {
+// Controller logic for creating an olduser //WORKS
+router.post("/registerolduser", async (req, res) => {
   try {
-    const oldUser = await OldUser.findById(req.params.id);
-    if (!oldUser) {
-      return res.status(404).send("Old user not found");
+    const {
+      name,
+      surname,
+      email,
+      mobile,
+      gender,
+      dateofbirth,
+      nid,
+      medpapers,
+      country,
+      city,
+      password,
+    } = req.body;
+    const role = "olduser"; // Set the role field to "olduser"
+
+    // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).send("Email address already exists");
     }
-    res.send(oldUser);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
 
-// Controller logic for creating an oldUser
-router.post("/register", createUser = (req, res) => {
-  try {
-    const { name, surname, email, mobile, country, city, password } = req.body;
-    const oldUser = new OldUser({ name, surname, email, mobile, country, city, password });
-    oldUser.save();
-    res.status(201).send(oldUser);
-  } catch (err) {
-    console.error("Error registering volunteer:", err);
-    res.status(500).send("Internal Server Error");
-  }
-});
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-// Route to update an oldUser user by ID
-router.patch("/patch/:id", async (req, res) => {
-  try {
-    const oldUser = await OldUser.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+    // Create new user if email is unique + the role
+    const user = new User({
+      name,
+      surname,
+      email,
+      mobile,
+      gender,
+      dateofbirth,
+      nid,
+      medpapers,
+      country,
+      city,
+      password: hashedPassword,
+      role,
     });
-    if (!oldUser) {
-      return res.status(404).send("Old user not found");
-    }
-    res.send(oldUser);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
+    await user.save();
 
-// Route to delete an oldUser user by ID
-router.delete("/delete/:id", async (req, res) => {
-  try {
-    const oldUser = await OldUser.findByIdAndDelete(req.params.id);
-    if (!oldUser) {
-      return res.status(404).send("Old user not found");
-    }
-    res.send(oldUser);
+    res.status(201).send(user);
   } catch (err) {
-    res.status(500).send(err);
+    console.error("Error registering user(olduser):", err);
+    res.status(500).send("Internal Server Error");
   }
 });
 

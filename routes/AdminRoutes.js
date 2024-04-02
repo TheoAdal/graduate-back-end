@@ -1,12 +1,12 @@
 // routes/AdminRoutes.js
 const express = require("express");
 const router = express.Router();
-const Admin = require("../models/Admin");
+const User = require("../models/User");
 
 // Controller logic for getting all admins //WORKS
 router.get("/getall", async (req, res) => {
   try {
-    const admins = await Admin.find();
+    const admins = await User.find();
     res.send(admins);
   } catch (err) {
     res.status(500).send(err);
@@ -16,7 +16,7 @@ router.get("/getall", async (req, res) => {
 // Route to get a specific admin user by ID //WORKS
 router.get("/get/:id", async (req, res) => {
   try {
-    const admin = await Admin.findById(req.params.id);
+    const admin = await User.findById(req.params.id);
     if (!admin) {
       return res.status(404).send("Admin not found");
     }
@@ -26,23 +26,52 @@ router.get("/get/:id", async (req, res) => {
   }
 });
 
-router.post("/register", async (req, res) => {
+// Controller logic for creating an admin //WORKS
+router.post("/registeradmin", async (req, res) => {
   try {
-    const { name, surname, email, mobile, password } = req.body;
+    const {
+      name,
+      surname,
+      email,
+      mobile,
+      gender,
+      dateofbirth,
+      nid,
+      country,
+      city,
+      password,
+    } = req.body;
+    const role = "admin"; // Set the role field to "admin"
 
     // Check if email already exists
-    const existingAdmin = await Admin.findOne({ email });
-    if (existingAdmin) {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.status(400).send("Email address already exists");
     }
 
-    // Create new admin if email is unique
-    const admin = new Volunteer({ name, surname, email, mobile, password });
-    await admin.save();
-    
-    res.status(201).send(admin);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create new user if email is unique + the role
+    const user = new User({
+      name,
+      surname,
+      email,
+      mobile,
+      gender,
+      dateofbirth,
+      nid,
+      country,
+      city,
+      password: hashedPassword,
+      role,
+    });
+
+    await user.save();
+
+    res.status(201).send(user);
   } catch (err) {
-    console.error("Error registering admin:", err);
+    console.error("Error registering user(volunteer):", err);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -50,7 +79,7 @@ router.post("/register", async (req, res) => {
 // Route to update a admin user by ID //WORKS
 router.patch("/patch/:id", async (req, res) => {
   try {
-    const admin = await Admin.findByIdAndUpdate(
+    const admin = await User.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
@@ -67,7 +96,7 @@ router.patch("/patch/:id", async (req, res) => {
 // Route to delete a admin user by ID //WORKS
 router.delete("/delete/:id", async (req, res) => {
   try {
-    const admin = await Admin.findByIdAndDelete(req.params.id);
+    const admin = await User.findByIdAndDelete(req.params.id);
     if (!admin) {
       return res.status(404).send("Admin not found");
     }

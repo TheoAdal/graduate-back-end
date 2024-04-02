@@ -13,11 +13,12 @@ const bcrypt = require('bcrypt')
 const saltRounds = 10 //required by bcrypt
 
 //Routes
-const userRoutes = require("../routes/UserRoutes");
-// const adminRoutes = require("../routes/AdminRoutes");
-// const managerRoutes = require("../routes/ManagementRoutes");
-// const volunteerRoutes = require("../routes/VolunteerRoutes");
-// const oldUserRoutes = require("../routes/OldUserRoutes");
+// const userRoutes = require("../routes/UserRoutes");
+const visitRoutes = require("../routes/VisitRoutes");
+const adminRoutes = require("../routes/AdminRoutes");
+const managerRoutes = require("../routes/ManagementRoutes");
+const volunteerRoutes = require("../routes/VolunteerRoutes");
+const oldUserRoutes = require("../routes/OldUserRoutes");
 
 connectDB;
 dotenv.config();
@@ -53,14 +54,38 @@ app.post("/login", async (req, res) => {
   res.send({ token, _id, name, surname, role });
 });
 
+//  Route to update a user by ID //WORKS
+router.patch("/patch/:id", async (req, res) => {
+  try {
+    // Find the user by ID
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    // Update user fields with the ones provided in the request body
+    Object.assign(user, req.body);
+
+    // Save the updated user
+    await user.save();
+
+    // Respond with the updated user
+    res.send(user);
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).send("Internal server error");
+  }
+});
+
 
 
 // Routes and controllers
-app.use('/users', userRoutes);
-// app.use('/admins', adminRoutes);
-// app.use("/managers", managerRoutes);
-// app.use("/volunteers", volunteerRoutes);
-// app.use("/olduser", oldUserRoutes);
+// app.use('/users', userRoutes);
+app.use('/visits', visitRoutes);
+app.use('/admins', adminRoutes);
+app.use("/managers", managerRoutes);
+app.use("/volunteers", volunteerRoutes);
+app.use("/olduser", oldUserRoutes);
 
 app.get("/", (_req, res) => {
   res.send("<h1>VRWMAAAAAAAA</h1>");
