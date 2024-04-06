@@ -1,14 +1,28 @@
 // routes/ManagementRoutes.js
 const express = require("express");
 const router = express.Router();
-const Manager = require("../models/Management");
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 // Controller logic for getting all users
 router.get("/getallmanagers", async (req, res) => {
-  //DOES NOT WORK YET
   try {
     const users = await User.find({ role: "manager" });
     res.send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// Route to get a specific user by ID //WORKS
+router.get("/get/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    res.send(user);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -60,6 +74,42 @@ router.post("/registermanager", async (req, res) => {
   } catch (err) {
     console.error("Error registering user(manager):", err);
     res.status(500).send("Internal Server Error");
+  }
+});
+
+// Route to update a user by ID //WORKS
+router.patch("/patch/:id", async (req, res) => {
+  try {
+    // Find the user by ID
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    // Update user fields with the ones provided in the request body
+    Object.assign(user, req.body);
+
+    // Save the updated user
+    await user.save();
+
+    // Respond with the updated user
+    res.send(user);
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).send("Internal server error");
+  }
+});
+
+// Route to delete a manager by ID //WORKS
+router.delete("/delete/:id", async (req, res) => {
+  try {
+    const manager = await User.findByIdAndDelete(req.params.id);
+    if (!manager) {
+      return res.status(404).send("Manager not found");
+    }
+    res.send(manager);
+  } catch (err) {
+    res.status(500).send(err);
   }
 });
 

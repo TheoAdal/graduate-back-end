@@ -8,7 +8,23 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 
+router.patch("/patch/:id", async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    res.send(user);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 
+module.exports = router;
 // Route to update a userState by ID //WORKS
 // router.patch("/changeState/:id", async (req, res) => {
 //   try {
@@ -438,4 +454,4 @@ const bcrypt = require("bcrypt");
 //   }
 // });
 
-module.exports = router;
+

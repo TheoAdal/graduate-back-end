@@ -2,6 +2,8 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 // Controller logic for getting all admins //WORKS
 router.get("/getall", async (req, res) => {
@@ -93,7 +95,7 @@ router.patch("/patch/:id", async (req, res) => {
   }
 });
 
-// Route to delete a admin user by ID //WORKS
+// Route to delete an admin user by ID //WORKS
 router.delete("/delete/:id", async (req, res) => {
   try {
     const admin = await User.findByIdAndDelete(req.params.id);
