@@ -3,13 +3,18 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const Visits = require("../models/Visits");
-
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 
 router.patch("/patch/:id", async (req, res) => {
   try {
+    // check if user changed his password
+    if (req.body.password) {
+      // hash the new password
+      req.body.password = await bcrypt.hash(req.body.password, 10);
+    }
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -43,6 +48,7 @@ module.exports = router;
 //       //Update userState from inactive to active and vice versa
 //       user.userState = userState === "inactive" ? "active" : "inactive";
 //     }
+
 
 //     // Save the updated user
 //     await user.save();

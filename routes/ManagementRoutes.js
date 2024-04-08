@@ -44,6 +44,7 @@ router.post("/registermanager", async (req, res) => {
       password,
     } = req.body;
     const role = "manager"; // Set the role field to "manager"
+    const userState = "inactive"; // Set the userState to "inactive"
 
     // Check if email already exists
     const existingUser = await User.findOne({ email });
@@ -54,7 +55,7 @@ router.post("/registermanager", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user if email is unique + the role
+    // Create new user if email is unique + the role + userState
     const user = new User({
       name,
       surname,
@@ -67,6 +68,7 @@ router.post("/registermanager", async (req, res) => {
       city,
       password: hashedPassword,
       role,
+      userState,
     });
     await user.save();
 
@@ -78,7 +80,29 @@ router.post("/registermanager", async (req, res) => {
 });
 
 // Route to update a user by ID //WORKS
-router.patch("/patch/:id", async (req, res) => {
+// router.patch("/patch/:id", async (req, res) => {
+//   try {
+//     // Find the user by ID
+//     const user = await User.findById(req.params.id);
+//     if (!user) {
+//       return res.status(404).send("User not found");
+//     }
+
+//     // Update user fields with the ones provided in the request body
+//     Object.assign(user, req.body);
+
+//     // Save the updated user
+//     await user.save();
+
+//     // Respond with the updated user
+//     res.send(user);
+//   } catch (err) {
+//     console.error("Error updating user:", err);
+//     res.status(500).send("Internal server error");
+//   }
+// });
+
+router.patch("/changeState/:id", async (req, res) => {
   try {
     // Find the user by ID
     const user = await User.findById(req.params.id);
@@ -86,8 +110,15 @@ router.patch("/patch/:id", async (req, res) => {
       return res.status(404).send("User not found");
     }
 
-    // Update user fields with the ones provided in the request body
-    Object.assign(user, req.body);
+    let userState = user.userState;
+
+    //if userState empty, set to "active"
+    if (!userState) {
+      userState = "active";
+    } else {
+      //Update userState from inactive to active and vice versa
+      user.userState = userState === "inactive" ? "active" : "inactive";
+    }
 
     // Save the updated user
     await user.save();

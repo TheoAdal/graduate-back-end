@@ -79,21 +79,21 @@ router.post("/registeradmin", async (req, res) => {
 });
 
 // Route to update a admin user by ID //WORKS
-router.patch("/patch/:id", async (req, res) => {
-  try {
-    const admin = await User.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!admin) {
-      return res.status(404).send("Admin not found");
-    }
-    res.send(admin);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
+// router.patch("/patch/:id", async (req, res) => {
+//   try {
+//     const admin = await User.findByIdAndUpdate(
+//       req.params.id,
+//       req.body,
+//       { new: true }
+//     );
+//     if (!admin) {
+//       return res.status(404).send("Admin not found");
+//     }
+//     res.send(admin);
+//   } catch (err) {
+//     res.status(400).send(err);
+//   }
+// });
 
 // Route to delete an admin user by ID //WORKS
 router.delete("/delete/:id", async (req, res) => {

@@ -2,6 +2,8 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 // Controller logic for getting all volunteers //WORKS
 router.get("/getallvol", async (req, res) => {
@@ -96,27 +98,27 @@ router.post("/registervolunteer", async (req, res) => {
 });
 
 // Route to update a user by ID //WORKS
-router.patch("/patch/:id", async (req, res) => {
-  try {
-    // Find the user by ID
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
+// router.patch("/patch/:id", async (req, res) => {
+//   try {
+//     // Find the user by ID
+//     const user = await User.findById(req.params.id);
+//     if (!user) {
+//       return res.status(404).send("User not found");
+//     }
 
-    // Update user fields with the ones provided in the request body
-    Object.assign(user, req.body);
+//     // Update user fields with the ones provided in the request body
+//     Object.assign(user, req.body);
 
-    // Save the updated user
-    await user.save();
+//     // Save the updated user
+//     await user.save();
 
-    // Respond with the updated user
-    res.send(user);
-  } catch (err) {
-    console.error("Error updating user:", err);
-    res.status(500).send("Internal server error");
-  }
-});
+//     // Respond with the updated user
+//     res.send(user);
+//   } catch (err) {
+//     console.error("Error updating user:", err);
+//     res.status(500).send("Internal server error");
+//   }
+// });
 
 router.patch("/changeState/:id", async (req, res) => {
   try {
