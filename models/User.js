@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
     required: false
   },
   dateofbirth: {
-    type: Date,
+    type: Date,//MPOREI NA TO KANW KAI STRING
     required: false
   },
   gender: {

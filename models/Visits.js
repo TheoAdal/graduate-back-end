@@ -26,15 +26,15 @@ const visitSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  time: {
+  appointmenttime: {
     type: String,
     required: true,
   },
-  date: {
+  appointmentdate: {
     type: String,
     required: true,
   },
-  type: {
+  description: {
     type: String,
     required: true,
   },
