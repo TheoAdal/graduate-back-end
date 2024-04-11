@@ -14,6 +14,10 @@ const visitSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  vol_number: {
+    type: String,
+    required: true,
+  },
   oldname: {
     type: String,
     required: true,
@@ -23,6 +27,10 @@ const visitSchema = new mongoose.Schema({
     required: true,
   },
   old_id: {
+    type: String,
+    required: true,
+  },
+  old_number: {
     type: String,
     required: true,
   },
