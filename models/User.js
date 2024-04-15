@@ -69,6 +69,10 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  verified:{ 
+    type: Boolean,
+    required: false,
+  }
 
 });
 
@@ -78,15 +82,15 @@ userSchema.methods.verifyPassword = async function (password) {
   return isMatch;
 };
 
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
+
 // Initialize GridFS stream
 // let gfs;
 // conn.once('open', () => {
 //   gfs = Grid(conn.db);
 // });
-
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
 
 // Export User model and GridFS stream
 // module.exports = { User, gfs }; 

@@ -1,9 +1,14 @@
 // routes/ManagementRoutes.js
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User");
+
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+
+const User = require("../models/User");
+const Token = require("../models/Token");
+const sendEmail = require("../utils/SendEmail");
 
 // Controller logic for getting all users
 router.get("/getallmanagers", async (req, res) => {
@@ -45,6 +50,7 @@ router.post("/registermanager", async (req, res) => {
     } = req.body;
     const role = "manager"; // Set the role field to "manager"
     const userState = "inactive"; // Set the userState to "inactive"
+    const verified = false;
 
     // Check if email already exists
     const existingUser = await User.findOne({ email });
@@ -55,7 +61,7 @@ router.post("/registermanager", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user if email is unique + the role + userState
+    // Create new user if email is unique + role + userState
     const user = new User({
       name,
       surname,
@@ -69,12 +75,23 @@ router.post("/registermanager", async (req, res) => {
       password: hashedPassword,
       role,
       userState,
+      verified, 
     });
     await user.save();
 
-    res.status(201).send(user);
+    // Create token for verification
+    const token = await new Token({
+			userId: user._id,
+			token: crypto.randomBytes(32).toString("hex"),
+		}).save();                  
+
+		const url = `http://localhost:3000/users/${user._id}/verify/${token.token}`;
+		await sendEmail(user.email, "Verify Email", url);
+    
+    res.status(201).send({ user, 
+      message: "An email has been sent to your account, please verify to log in !!!" });
   } catch (err) {
-    console.error("Error registering user(manager):", err);
+    console.error("Error registering user (manager):", err);
     res.status(500).send("Internal Server Error");
   }
 });

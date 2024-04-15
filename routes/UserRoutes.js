@@ -1,10 +1,15 @@
 // routes/UserRoutes.js
 const express = require("express");
 const router = express.Router();
+
 const User = require("../models/User");
 const Visits = require("../models/Visits");
+const Token = require("../models/Token");
+const sendEmail = require("../utils/SendEmail");
+
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 
 router.patch("/patch/:id", async (req, res) => {
@@ -26,6 +31,31 @@ router.patch("/patch/:id", async (req, res) => {
     res.send(user);
   } catch (err) {
     res.status(400).send(err);
+  }
+});
+
+router.get("/:id/verify/:token", async (req, res) => {
+  if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).send({ message: "Invalid ID format" });
+}
+if (!req.params.token.match(/^[0-9a-fA-F]{64}$/)) {
+    return res.status(400).send({ message: "Invalid token format" });
+}
+  try {
+      const user = await User.findOne({ _id: req.params.id });
+      if (!user) return res.status(400).send({ message: "Invalid user" });
+
+      const token = await Token.findOne({userId: user._id,token: req.params.token, });
+      if (!token) return res.status(400).send({ message: "Invalid token" });
+
+      await User.updateOne({ _id: user._id }, { verified: true });
+      
+
+      res.status(200).send({ message: "Email verified successfully" });
+      await Token.deleteOne({ _id: token._id });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Internal Server Error" });
   }
 });
 

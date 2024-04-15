@@ -5,12 +5,16 @@ const cors = require("cors");
 const router = express.Router();
 const app = express();
 const connectDB = require("../DbConfig.js");
+
 const User = require("../models/User");
 const Visits = require("../models/Visits");
+const Token = require("../models/Token");
+const sendEmail = require("../utils/SendEmail");
 
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
-const saltRounds = 10 //required by bcrypt
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const saltRounds = 10; //required by bcrypt
+const crypto = require("crypto");
 
 //Routes
 const userRoutes = require("../routes/UserRoutes");
@@ -26,29 +30,29 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:3000", //DELETE THIS
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
   })
 );
 
 //FOR CREATING LOGIN AUTHENTICATION
 //https://medium.com/@simonsruggi/how-to-implement-jwt-authentication-with-react-and-node-js-5d8bf3e718d0
-    
+
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
 
-  if (!user) 
-    return res.status(400).send("Invalid email or password.");
+  if (!user) return res.status(400).send("Invalid email or password.");
 
   const validPassword = await bcrypt.compare(password, user.password);
 
-  if (!validPassword)
-    return res.status(400).send("Invalid email or password.");
+  if (!validPassword) return res.status(400).send("Invalid email or password.");
 
-    const { _id, name, surname, role } = user;
-    const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
+  if (!user.verified) return res.status(403).send("Please verify your email.");
+
+  const { _id, name, surname, role } = user;
+  const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
 
   //send role + name + surname + token + _id to frontend
   res.send({ token, _id, name, surname, role });
@@ -56,11 +60,9 @@ app.post("/login", async (req, res) => {
 
 router.patch("/patch/:id", async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     if (!user) {
       return res.status(404).send("User not found");
     }
@@ -70,18 +72,16 @@ router.patch("/patch/:id", async (req, res) => {
   }
 });
 
-
-
 // Routes and controllers
-app.use('/users', userRoutes);
-app.use('/visits', visitRoutes);
-app.use('/admins', adminRoutes);
+app.use("/users", userRoutes);
+app.use("/visits", visitRoutes);
+app.use("/admins", adminRoutes);
 app.use("/managers", managerRoutes);
 app.use("/volunteers", volunteerRoutes);
 app.use("/oldusers", oldUserRoutes);
 
 app.get("/", (_req, res) => {
-  res.send("<h1>VRWMAAAAAAAA</h1>");
+  res.send("<h1>Dont mind me, just checking in :)</h1>");
 });
 
 // Start the server
