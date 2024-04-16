@@ -51,6 +51,8 @@ router.post("/registermanager", async (req, res) => {
     const role = "manager"; // Set the role field to "manager"
     const userState = "inactive"; // Set the userState to "inactive"
     const verified = false;
+    const resetPasswordToken = "";
+    const resetPasswordExpires = "";
 
     // Check if email already exists
     const existingUser = await User.findOne({ email });
@@ -76,6 +78,8 @@ router.post("/registermanager", async (req, res) => {
       role,
       userState,
       verified, 
+      resetPasswordToken,
+      resetPasswordExpires 
     });
     await user.save();
 

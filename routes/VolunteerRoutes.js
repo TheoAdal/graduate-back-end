@@ -69,6 +69,8 @@ router.post("/registervolunteer", async (req, res) => {
     const role = "volunteer"; // Set the role field to "volunteer"
     const userState = "inactive"; // Set the userState to "inactive"
     const verified = false;
+    const resetPasswordToken = undefined;
+    const resetPasswordExpires = undefined;
 
     // Check if email already exists
     const existingUser = await User.findOne({ email });
@@ -93,7 +95,9 @@ router.post("/registervolunteer", async (req, res) => {
       password: hashedPassword,
       role,
       userState,
-      verified, //
+      verified, 
+      resetPasswordToken,
+      resetPasswordExpires
     });
     await user.save();
 

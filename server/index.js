@@ -54,7 +54,7 @@ app.post("/login", async (req, res) => {
   const { _id, name, surname, role } = user;
   const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
 
-  //send role + name + surname + token + _id to frontend
+  //send role + name + surname + token + _id to frontend 
   res.send({ token, _id, name, surname, role });
 });
 
