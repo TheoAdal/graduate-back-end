@@ -176,6 +176,42 @@ router.delete("/delete/:id", async (req, res) => {
   }
 });
 
+router.get("/olduser-stats", async (req, res) => {
+  try {
+    const pipeline = [
+      // { $match: { role: "olduser", userState: "active" } },
+      { $match: { role: "olduser" } }, // Filter to only include oldusers
+      {
+        $group: {
+          _id: { city: "$city", gender: "$gender" }, // Group by city and gender
+          count: { $sum: 1 } // Count the number of oldusers in each group
+        }
+      },
+      {
+        $group: {
+          _id: "$_id.city", // Further group by city to structure the data by city
+          genders: {
+            $push: {
+              gender: "$_id.gender",
+              count: "$count"
+            }
+          },
+          total: { $sum: "$count" } // Sum up all counts per city to get the total per city
+        }
+      },
+      {
+        $sort: { "_id": 1 } // Sort by city alphabetically
+      }
+    ];
+
+    const oldUserStats = await User.aggregate(pipeline);
+    res.send(oldUserStats);
+  } catch (err) {
+    console.error("Error fetching olduser stats:", err);
+    res.status(500).send("Internal server error");
+  }
+});
+
 // Define more routes as needed
 
 module.exports = router;

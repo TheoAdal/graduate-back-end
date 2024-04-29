@@ -62,10 +62,11 @@ router.post("/registervolunteer", async (req, res) => {
       gender,
       dateofbirth,
       nid,
-      country,
+      // country,
       city,
       password,
     } = req.body;
+    const country = "Cyprus"; // Set the country field to "Cyprus"
     const role = "volunteer"; // Set the role field to "volunteer"
     const userState = "inactive"; // Set the userState to "inactive"
     const verified = false;
@@ -157,6 +158,42 @@ router.delete("/delete/:id", async (req, res) => {
     res.send(user);
   } catch (err) {
     res.status(500).send(err);
+  }
+});
+
+router.get("/volunteer-stats", async (req, res) => {
+  try {
+    const pipeline = [
+      // { $match: { role: "volunteer", userState: "active" } },
+      { $match: { role: "volunteer",  } }, // Filter to only include volunteers
+      {
+        $group: {
+          _id: { city: "$city", gender: "$gender" }, // Group by city and gender
+          count: { $sum: 1 } // Count the number of volunteers in each group
+        }
+      },
+      {
+        $group: {
+          _id: "$_id.city", // Further group by city to structure the data by city
+          genders: {
+            $push: {
+              gender: "$_id.gender",
+              count: "$count"
+            }
+          },
+          total: { $sum: "$count" } // Sum up all counts per city to get the total per city
+        }
+      },
+      {
+        $sort: { "_id": 1 } // Sort by city alphabetically
+      }
+    ];
+
+    const volunteerStats = await User.aggregate(pipeline);
+    res.send(volunteerStats);
+  } catch (err) {
+    console.error("Error fetching volunteer stats:", err);
+    res.status(500).send("Internal server error");
   }
 });
 
