@@ -23,6 +23,8 @@ const adminRoutes = require("../routes/AdminRoutes");
 const managerRoutes = require("../routes/ManagementRoutes");
 const volunteerRoutes = require("../routes/VolunteerRoutes");
 const oldUserRoutes = require("../routes/OldUserRoutes");
+const appointmentRequestRoutes = require('../routes/AppointmentRequestRoutes');
+
 
 connectDB;
 dotenv.config();
@@ -80,6 +82,7 @@ app.use("/admins", adminRoutes);
 app.use("/managers", managerRoutes);
 app.use("/volunteers", volunteerRoutes);
 app.use("/oldusers", oldUserRoutes);
+app.use("/requests", appointmentRequestRoutes);
 
 app.get("/", (_req, res) => {
   res.send("<h1>Dont mind me, just checking in :)</h1>");

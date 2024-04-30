@@ -46,6 +46,7 @@ const visitSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  
 });
 
 const Visits = mongoose.model("Visits", visitSchema);

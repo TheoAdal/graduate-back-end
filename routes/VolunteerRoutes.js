@@ -8,7 +8,9 @@ const crypto = require("crypto");
 
 const User = require("../models/User");
 const Token = require("../models/Token");
+const AppointmentRequest = require('../models/AppointmentRequest');
 const sendEmail = require("../utils/SendEmail");
+const { calculateAge, categorizeAge } = require('../utils/ageUtils'); // Assuming you have these utilities
 
 // Controller logic for getting all volunteers //WORKS
 router.get("/getallvol", async (req, res) => {
@@ -194,6 +196,31 @@ router.get("/volunteer-stats", async (req, res) => {
   } catch (err) {
     console.error("Error fetching volunteer stats:", err);
     res.status(500).send("Internal server error");
+  }
+});
+
+// Endpoint to fetch matching appointment requests for a volunteer
+router.get('/matching-requests/:volunteerId', async (req, res) => {
+  try {
+    const { volunteerId } = req.params; // Extracting volunteerId from route parameters
+    const volunteer = await User.findById(volunteerId);
+
+    if (!volunteer) {
+      return res.status(404).send('Volunteer not found');
+    }
+
+    const volunteerAgeRange = categorizeAge(calculateAge(volunteer.birthdate));
+    
+    const requests = await AppointmentRequest.find({
+      $or: [
+        { preferredCity: volunteer.city, preferredAge: volunteerAgeRange, preferredGender: volunteer.gender },
+        { status: 'pending' } // Optionally fetch all pending requests if no preferences match
+      ]
+    }).populate('oldUserId', '-password -tokens'); // Populate to get details about the old user making the request
+
+    res.status(200).json(requests);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching requests: ' + error.message });
   }
 });
 
