@@ -6,28 +6,41 @@ const AppointmentRequest = require("../models/AppointmentRequest");
 const { calculateAge, categorizeAge } = require("../utils/ageUtils");
 
 router.post("/create", async (req, res) => {
-  try {
-    // Parse appointmentDate string to Date object
-    const appointmentDate = new Date(req.body.appointmentDate);
-    // Check if the parsed date is valid
-    if (isNaN(appointmentDate.getTime())) {
-      return res.status(400).json({ message: "Invalid appointmentDate value" });
+    try {
+      const { oldUserId, appointmentDate } = req.body;
+  
+      // Check if the parsed appointmentDate is valid
+      const parsedAppointmentDate = new Date(appointmentDate);
+      if (isNaN(parsedAppointmentDate.getTime())) {
+        return res.status(400).json({ message: "Invalid appointmentDate value" });
+      }
+      // Format the appointment date as YYYY-MM-DD
+      const formattedAppointmentDate = parsedAppointmentDate.toISOString().split("T")[0];
+  
+      // Check if there's an existing request with the same appointment date and oldUserId
+      const existingRequest = await AppointmentRequest.findOne({ oldUserId, appointmentDate: formattedAppointmentDate });
+      if (existingRequest) {
+        return res.status(400).json({ message: "An appointment already exists for this date" });
+      }
+  
+      // Parse requestDate string to Date object (assuming it's already in date format)
+      const requestDate = new Date();
+      // Format the request date as YYYY-MM-DD
+      const formattedRequestDate = requestDate.toISOString().split("T")[0];
+  
+      const newRequest = new AppointmentRequest({
+        oldUserId,
+        appointmentDate: formattedAppointmentDate,
+        requestDate: formattedRequestDate,
+        ...req.body
+      });
+      await newRequest.save();
+      res.status(201).json(newRequest);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-    // Format the appointment date as YYYY-MM-DD
-    req.body.appointmentDate = appointmentDate.toISOString().split("T")[0];
-
-    // Parse requestDate string to Date object (assuming it's already in date format)
-    const requestDate = new Date();
-    // Format the request date as YYYY-MM-DD
-    req.body.requestDate = requestDate.toISOString().split("T")[0];
-
-    const newRequest = new AppointmentRequest(req.body);
-    await newRequest.save();
-    res.status(201).json(newRequest);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+  });
+  
 
 router.get("/volunteer/requests", async (req, res) => {
   const { ageRange, city, gender } = req.query;
@@ -68,25 +81,25 @@ router.patch("/accept/:id", async (req, res) => {
 });
 
 // Decline an appointment request
-router.patch("/decline/:id", async (req, res) => {
-  try {
-    const request = await AppointmentRequest.findByIdAndUpdate(
-      req.params.id,
-      {
-        status: "declined",
-      },
-      { new: true }
-    );
+// router.patch("/decline/:id", async (req, res) => {
+//   try {
+//     const request = await AppointmentRequest.findByIdAndUpdate(
+//       req.params.id,
+//       {
+//         status: "declined",
+//       },
+//       { new: true }
+//     );
 
-    if (!request) {
-      return res.status(404).json({ message: "Request not found" });
-    }
+//     if (!request) {
+//       return res.status(404).json({ message: "Request not found" });
+//     }
 
-    res.status(200).json({ message: "Request declined", request });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
-  }
-});
+//     res.status(200).json({ message: "Request declined", request });
+//   } catch (error) {
+//     res.status(500).json({ message: "Internal server error", error });
+//   }
+// });
 
 router.get("/users/by-age-range", async (req, res) => {
   try {

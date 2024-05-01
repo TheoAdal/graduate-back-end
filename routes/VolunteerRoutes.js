@@ -209,14 +209,40 @@ router.get('/matching-requests/:volunteerId', async (req, res) => {
       return res.status(404).send('Volunteer not found');
     }
 
-    const volunteerAgeRange = categorizeAge(calculateAge(volunteer.birthdate));
-    
-    const requests = await AppointmentRequest.find({
+    // Log volunteer's date of birth and age range
+    console.log("Volunteer's date of birth:", volunteer.dateofbirth);
+    console.log("Volunteer's age range:", categorizeAge(calculateAge(volunteer.dateofbirth)));
+
+    // Step 1: Fetch confirmed appointments of the volunteer
+    const confirmedAppointments = await AppointmentRequest.find({
+      volunteerId,
+      status: 'accepted' // Assuming accepted appointments have a status field indicating they are accepted
+    }).select('appointmentDate');
+
+    // Extract appointment dates from confirmed appointments
+    const confirmedAppointmentDates = confirmedAppointments.map(appointment => appointment.appointmentDate);
+
+    const volunteerAgeRange = categorizeAge(calculateAge(volunteer.dateofbirth));
+
+const requests = await AppointmentRequest.find({
+  $and: [
+    {
       $or: [
-        { preferredCity: volunteer.city, preferredAge: volunteerAgeRange, preferredGender: volunteer.gender },
-        { status: 'pending' } // Optionally fetch all pending requests if no preferences match
+        { preferredCity: volunteer.city },
+        { preferredGender: volunteer.gender }
       ]
-    }).populate('oldUserId', '-password -tokens'); // Populate to get details about the old user making the request
+    },
+    { preferredAge: volunteerAgeRange },
+    { status: 'pending' },
+    { appointmentDate: { $nin: confirmedAppointmentDates } }
+  ]
+}).populate({
+  path: 'oldUserId',
+  select: '-password -tokens' // Exclude sensitive fields from old user data
+});
+
+    // Log fetched requests
+    console.log("Fetched requests:", requests);
 
     res.status(200).json(requests);
   } catch (error) {
