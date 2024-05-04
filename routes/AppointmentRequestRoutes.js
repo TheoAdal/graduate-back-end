@@ -4,6 +4,7 @@ const router = express.Router();
 const User = require("../models/User");
 const AppointmentRequest = require("../models/AppointmentRequest");
 const { calculateAge, categorizeAge } = require("../utils/ageUtils");
+const sendEmail = require("../utils/SendEmail");
 
 router.get('/getallrequests', async (req, res) => {
     try {
@@ -89,11 +90,18 @@ router.patch("/accept/:id", async (req, res) => {
         acceptedBy: volunteerId,
       },
       { new: true }
+
     );
 
     if (!request) {
       return res.status(404).json({ message: "Request not found" });
     }
+
+    const oldUser = await User.findById(request.oldUserId);
+
+    const text = `Your request has been accepted by a volunteer!!!,\n\n
+                  Log into your account to see who accepted it.\n\n`
+		await sendEmail(oldUser.email, "You have an appointment!!!", text);
 
     res.status(200).json({ message: "Request accepted", request });
   } catch (error) {
