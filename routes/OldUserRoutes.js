@@ -49,14 +49,14 @@ router.post("/registerolduser", async (req, res) => {
       gender,
       dateofbirth,
       nid,
-      medpapers,
-      country,
+      // medpapers,
+      // country,
       city,
       password,
     } = req.body;
+    const country = "Cyprus"; // Set the country field to "Cyprus"
     const role = "olduser"; // Set the role field to "olduser"
-    const userState = "inactive"; // Set the userState to "inactive"
-    
+    const userState = "active"; // Set the userState to "active"
     const verified = false;
     const resetPasswordToken = "";
     

@@ -49,7 +49,7 @@ router.post("/registermanager", async (req, res) => {
       password,
     } = req.body;
     const role = "manager"; // Set the role field to "manager"
-    const userState = "inactive"; // Set the userState to "inactive"
+    const userState = "active"; // Set the userState to "active"
     const verified = false;
     const resetPasswordToken = "";
     const resetPasswordExpires = "";
