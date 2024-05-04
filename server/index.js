@@ -54,6 +54,8 @@ app.post("/login", async (req, res) => {
 
   if (!user.verified) return res.status(403).send("Please verify your email.");
 
+  if (user.userState == "inactive") return res.status(403).send("Your account is disabled, please contact us to revert your account state");
+
   const { _id, name, surname, role } = user;
   const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
 

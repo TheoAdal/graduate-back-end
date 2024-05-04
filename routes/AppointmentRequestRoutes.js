@@ -5,6 +5,27 @@ const User = require("../models/User");
 const AppointmentRequest = require("../models/AppointmentRequest");
 const { calculateAge, categorizeAge } = require("../utils/ageUtils");
 
+router.get('/getallrequests', async (req, res) => {
+    try {
+        // Fetch all appointments from the database and populate the fields
+        const allAppointments = await AppointmentRequest.find()
+            .populate('acceptedBy', 'name surname mobile') // Populate volunteer details
+            .populate('oldUserId', 'name surname mobile'); // Populate old user details
+  
+        // If there are no appointments, send a 404 response
+        if (!allAppointments || allAppointments.length === 0) {
+            return res.status(404).json({ message: 'No appointments found' });
+        }
+  
+        // If appointments are found, send them in the response
+        res.status(200).json(allAppointments);
+    } catch (error) {
+        // If an error occurs, send a 500 response with the error message
+        console.error('Error fetching appointments:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 router.post("/create", async (req, res) => {
     try {
       const { oldUserId, appointmentDate } = req.body;
@@ -42,20 +63,20 @@ router.post("/create", async (req, res) => {
   });
   
 
-router.get("/volunteer/requests", async (req, res) => {
-  const { ageRange, city, gender } = req.query;
-  try {
-    const requests = await AppointmentRequest.find({
-      preferredAge: ageRange,
-      preferredCity: city,
-      preferredGender: gender,
-      status: "pending",
-    });
-    res.status(200).json(requests);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// router.get("/volunteer/requests", async (req, res) => {
+//   const { ageRange, city, gender } = req.query;
+//   try {
+//     const requests = await AppointmentRequest.find({
+//       preferredAge: ageRange,
+//       preferredCity: city,
+//       preferredGender: gender,
+//       status: "pending",
+//     });
+//     res.status(200).json(requests);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
 
 // Accept an appointment request
 router.patch("/accept/:id", async (req, res) => {
@@ -139,5 +160,48 @@ router.get('/appointmentrequests/accepted/:id', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+router.get("/request-accepted-stats", async (req, res) => {
+  try {
+    const pipeline = [
+      // Add any filters you need for requests
+      {
+        $group: {
+          _id: { city: "$preferredCity", ageGroup: "$preferredAge", 
+                gender: "$preferredGender"}, // Group by city, age group, and gender
+          count: { $sum: 1 } // Count the number of requests in each group
+        }
+      },
+      {
+        $group: {
+          _id: "$_id.city", // Further group by city to structure the data by city
+          ageGroups: {
+            $push: {
+              ageGroup: "$_id.ageGroup",
+              count: "$count"
+            }
+          },
+          genders: {
+            $push: {
+              gender: "$_id.gender",
+              count: "$count"
+            }
+          },
+          total: { $sum: "$count" } // Sum up all counts per city to get the total per city
+        }
+      },
+      {
+        $sort: { "_id": 1 } // Sort by city alphabetically
+      }
+    ];
+
+    const requestStats = await AppointmentRequest.aggregate(pipeline);
+    res.send(requestStats);
+  } catch (err) {
+    console.error("Error fetching request stats:", err);
+    res.status(500).send("Internal server error");
+  }
+});
+
 
 module.exports = router;

@@ -90,7 +90,9 @@ router.post("/registermanager", async (req, res) => {
 		}).save();                  
 
 		const url = `http://localhost:3000/users/${user._id}/verify/${token.token}`;
-		await sendEmail(user.email, "Verify Email", url);
+		const text = `Hello new admin, please verify your account,\n\n
+    ${url} \n\n\n`
+		await sendEmail(user.email, "Verify Email", text);
     
     res.status(201).send({ user, 
       message: "An email has been sent to your account, please verify to log in !!!" });

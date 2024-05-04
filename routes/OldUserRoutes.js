@@ -98,7 +98,10 @@ router.post("/registerolduser", async (req, res) => {
 		}).save();                  
 
 		const url = `http://localhost:3000/users/${user._id}/verify/${token.token}`;
-		await sendEmail(user.email, "Verify Email", url);
+		const text = `Congragulations, and welcome to the Friendship At All Ages team,\n\n
+    only one step remains to activate your account, click the link below to verify your account:
+    ${url} \n\n\n`
+		await sendEmail(user.email, "Verify Email", text);
     
     res.status(201).send({ user, 
       message: "An email has been sent to your account, please verify to log in !!!" });
