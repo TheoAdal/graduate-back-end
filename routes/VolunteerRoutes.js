@@ -9,6 +9,7 @@ const crypto = require("crypto");
 const User = require("../models/User");
 const Token = require("../models/Token");
 const AppointmentRequest = require('../models/AppointmentRequest');
+
 const sendEmail = require("../utils/SendEmail");
 const { calculateAge, categorizeAge } = require('../utils/ageUtils'); // Assuming you have these utilities
 
@@ -19,8 +20,8 @@ router.get("/getallvol", async (req, res) => {
     res.send(users);
   } catch (err) {
     res.status(500).send(err);
-  }
-});
+  } 
+});  
 // Controller logic for getting all active volunteers //WORKS
 router.get("/getallactivevol", async (req, res) => {
   try {
@@ -169,7 +170,6 @@ router.delete("/delete/:id", async (req, res) => {
 router.get("/volunteer-stats", async (req, res) => {
   try {
     const pipeline = [
-      // { $match: { role: "volunteer", userState: "active" } },
       { $match: { role: "volunteer",  } }, // Filter to only include volunteers
       {
         $group: {
@@ -245,7 +245,7 @@ const requests = await AppointmentRequest.find({
 });
 
     // Log fetched requests
-    console.log("Fetched requests:", requests);
+    // console.log("Fetched requests:", requests);
 
     res.status(200).json(requests);
   } catch (error) {

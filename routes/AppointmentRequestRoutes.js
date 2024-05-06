@@ -86,17 +86,17 @@ router.patch("/accept/:id", async (req, res) => {
     const request = await AppointmentRequest.findByIdAndUpdate(
       req.params.id,
       {
-        status: "accepted",
+        status: "accepted", 
         acceptedBy: volunteerId,
       },
       { new: true }
-
     );
 
     if (!request) {
       return res.status(404).json({ message: "Request not found" });
     }
 
+    
     const oldUser = await User.findById(request.oldUserId);
 
     const text = `Your request has been accepted by a volunteer!!!,\n\n
