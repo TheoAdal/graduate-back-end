@@ -213,8 +213,8 @@ router.get('/matching-requests/:volunteerId', async (req, res) => {
     }
 
     // Log volunteer's date of birth and age range
-    console.log("Volunteer's date of birth:", volunteer.dateofbirth);
-    console.log("Volunteer's age range:", categorizeAge(calculateAge(volunteer.dateofbirth)));
+    // console.log("Volunteer's date of birth:", volunteer.dateofbirth);
+    // console.log("Volunteer's age range:", categorizeAge(calculateAge(volunteer.dateofbirth)));
 
     // Step 1: Fetch confirmed appointments of the volunteer
     const confirmedAppointments = await AppointmentRequest.find({
