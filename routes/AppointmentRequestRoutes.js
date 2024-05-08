@@ -146,7 +146,7 @@ router.get("/users/by-age-range", async (req, res) => {
 });
 
 // GET accepted appointment requests for a specific user
-router.get('/appointmentrequests/accepted/:id', async (req, res) => {
+router.get('/appointmentrequests/accepted/:userId', async (req, res) => {
     const { userId } = req.params;
 
     try {
@@ -154,7 +154,7 @@ router.get('/appointmentrequests/accepted/:id', async (req, res) => {
         const acceptedRequests = await AppointmentRequest.find({
             $or: [
                 { oldUserId: userId },
-                { volunteerId: userId }
+                { acceptedBy: userId }
             ],
             status: 'accepted'
             
