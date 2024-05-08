@@ -10,6 +10,7 @@ const User = require("../models/User");
 const Token = require("../models/Token");
 const sendEmail = require("../utils/SendEmail");
 
+
 // Controller logic for getting all users //WORKS
 router.get("/getalloldusers", async (req, res) => {
   try {
@@ -36,6 +37,16 @@ router.get("/getallinactiveold", async (req, res) => {
   } catch (err) {
     res.status(500).send(err);
   }
+});
+
+// Controller logic for getting all verified oldusers //WORKS
+router.get("/getallverifiedold", async (req, res) => {
+  try {
+    const users = await User.find({ role: "olduser", verified: true });
+    res.send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  } 
 });
 
 // Controller logic for creating an olduser //WORKS
@@ -218,3 +229,20 @@ router.get("/olduser-stats", async (req, res) => {
 // Define more routes as needed
 
 module.exports = router;
+
+// router.patch("/verifyallold", async (req, res) => {
+//   try {
+//     // Find all users with the role "volunteer" and update their "verified" field to true
+//     const result = await User.updateMany({ role: "olduser" }, { $set: { verified: true } });
+
+//     // Check if any users were found and updated
+//     if (result.nModified > 0) {
+//       res.status(200).json({ message: "Verification successful for all oldusers" });
+//     } else {
+//       res.status(404).json({ message: "No oldusers found to verify" });
+//     }
+//   } catch (err) {
+//     console.error("Error verifying oldusers:", err);
+//     res.status(500).json({ message: "Internal server error" });
+//   } 
+// }); 

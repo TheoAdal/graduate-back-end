@@ -13,6 +13,7 @@ const AppointmentRequest = require('../models/AppointmentRequest');
 const sendEmail = require("../utils/SendEmail");
 const { calculateAge, categorizeAge } = require('../utils/ageUtils'); // Assuming you have these utilities
 
+
 // Controller logic for getting all volunteers //WORKS
 router.get("/getallvol", async (req, res) => {
   try {
@@ -39,6 +40,16 @@ router.get("/getallinactivevol", async (req, res) => {
   } catch (err) {
     res.status(500).send(err);
   }
+});
+
+// Controller logic for getting all verifiedvolunteers //WORKS
+router.get("/getallverifiedvol", async (req, res) => {
+  try {
+    const users = await User.find({ role: "volunteer", verified: true });
+    res.send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  } 
 });
 
 // Route to get a specific user by ID //WORKS
@@ -280,6 +291,24 @@ const requests = await AppointmentRequest.find({
 // });
 
 module.exports = router;
+
+
+// router.patch("/verifyallvolunteers", async (req, res) => {
+//   try {
+//     // Find all users with the role "volunteer" and update their "verified" field to true
+//     const result = await User.updateMany({ role: "volunteer" }, { $set: { verified: true } });
+
+//     // Check if any users were found and updated
+//     if (result.nModified > 0) {
+//       res.status(200).json({ message: "Verification successful for all volunteers" });
+//     } else {
+//       res.status(404).json({ message: "No volunteers found to verify" });
+//     }
+//   } catch (err) {
+//     console.error("Error verifying volunteers:", err);
+//     res.status(500).json({ message: "Internal server error" });
+//   } 
+// }); 
 
 // Route to update a user by ID //WORKS
 // router.patch("/patch/:id", async (req, res) => {
