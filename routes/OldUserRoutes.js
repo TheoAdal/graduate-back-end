@@ -49,6 +49,19 @@ router.get("/getallverifiedold", async (req, res) => {
   } 
 });
 
+// Route to get a specific user by ID //WORKS
+router.get("/get/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    res.send(user);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 // Controller logic for creating an olduser //WORKS
 router.post("/registerolduser", async (req, res) => {
   try {
