@@ -15,7 +15,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10; //required by bcrypt
 const crypto = require("crypto");
-
+  
 //Routes
 const userRoutes = require("../routes/UserRoutes");
 const visitRoutes = require("../routes/VisitRoutes");
@@ -38,8 +38,6 @@ app.use(
   })
 );
 
-//FOR CREATING LOGIN AUTHENTICATION
-//https://medium.com/@simonsruggi/how-to-implement-jwt-authentication-with-react-and-node-js-5d8bf3e718d0
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;

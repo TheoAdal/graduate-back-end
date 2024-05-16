@@ -13,7 +13,7 @@ function connectDB() {
     });
   } catch (err) {
     console.error(err.message);
-    process.exit(1);
+    process.exit(1);  
   }
 
   const dbConnection = mongoose.connection;
@@ -25,6 +25,6 @@ function connectDB() {
     console.error(`connection error: ${err}`);
   });
   return;
-}
+} 
 
 connectDB();

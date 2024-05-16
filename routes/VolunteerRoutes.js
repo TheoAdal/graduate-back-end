@@ -223,11 +223,7 @@ router.get('/matching-requests/:volunteerId', async (req, res) => {
       return res.status(404).send('Volunteer not found');
     }
 
-    // Log volunteer's date of birth and age range
-    // console.log("Volunteer's date of birth:", volunteer.dateofbirth);
-    // console.log("Volunteer's age range:", categorizeAge(calculateAge(volunteer.dateofbirth)));
-
-    // Step 1: Fetch confirmed appointments of the volunteer
+    // Step 1: Fetch confirmed appointments of the volunteer to avoid conflicts
     const confirmedAppointments = await AppointmentRequest.find({
       volunteerId,
       status: 'accepted' // Assuming accepted appointments have a status field indicating they are accepted
@@ -237,6 +233,8 @@ router.get('/matching-requests/:volunteerId', async (req, res) => {
     const confirmedAppointmentDates = confirmedAppointments.map(appointment => appointment.appointmentDate);
 
     const volunteerAgeRange = categorizeAge(calculateAge(volunteer.dateofbirth));
+
+    const currentDateString = new Date().toISOString().split('T')[0]; // Get current date as YYYY-MM-DD
 
 const requests = await AppointmentRequest.find({
   $and: [
@@ -248,7 +246,8 @@ const requests = await AppointmentRequest.find({
     },
     { preferredAge: volunteerAgeRange },
     { status: 'pending' },
-    { appointmentDate: { $nin: confirmedAppointmentDates } }
+    { appointmentDate: { $nin: confirmedAppointmentDates } },
+    {appointmentDate: { $gte: currentDateString } } // Only include future dates
   ]
 }).populate({
   path: 'oldUserId',
