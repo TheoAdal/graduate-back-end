@@ -223,7 +223,7 @@ router.get('/matching-requests/:volunteerId', async (req, res) => {
       return res.status(404).send('Volunteer not found');
     }
 
-    // Step 1: Fetch confirmed appointments of the volunteer to avoid conflicts
+    // Step 1: Fetch confirmed appointments of the volunteer that have the same dates 
     const confirmedAppointments = await AppointmentRequest.find({
       volunteerId,
       status: 'accepted' // Assuming accepted appointments have a status field indicating they are accepted

@@ -78,6 +78,7 @@ router.post("/registerolduser", async (req, res) => {
       city,
       password,
     } = req.body;
+
     const country = "Cyprus"; // Set the country field to "Cyprus"
     const role = "olduser"; // Set the role field to "olduser"
     const userState = "active"; // Set the userState to "active"
@@ -86,7 +87,7 @@ router.post("/registerolduser", async (req, res) => {
     
     const resetPasswordExpires = "";
 
-    // Check if email already exists
+    // Check if email already exists 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).send("Email address already exists");
