@@ -238,22 +238,23 @@ router.get('/matching-requests/:volunteerId', async (req, res) => {
 
 const requests = await AppointmentRequest.find({
   $and: [
-    {
-      $or: [
-        { preferredCity: volunteer.city },
-        { preferredGender: volunteer.gender  },
-        { preferredGender: "all" } // Check for "all" option in gender
-      ]
-    },
-    {
-      $or: [
-        { preferredAge: volunteerAgeRange },
-        { preferredAge: "all" } // Check for "all" option in age
-      ]
-    },
+    { preferredCity: volunteer.city },
     { status: 'pending' },
     { appointmentDate: { $nin: confirmedAppointmentDates } },
-    {appointmentDate: { $gte: currentDateString } } // Only include future dates
+    {appointmentDate: { $gte: currentDateString } }, // Only include future dates
+    {
+      $or: [
+        { preferredGender: "all" },
+        { preferredGender: volunteer.gender }
+      ]
+    },
+    {
+      $or: [
+        { preferredAge: "all" },
+        { preferredAge: volunteerAgeRange }
+      ]
+    },
+    
   ]
 }).populate({
   path: 'oldUserId',
