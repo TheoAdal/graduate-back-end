@@ -9,7 +9,7 @@ const appointmentRequestSchema = new mongoose.Schema({
   },
   preferredAge: {
     type: String, // Changed from Number to String to accommodate age ranges
-    enum: ['16-20', '21-30', '31-40', '41-50', '51++'], // Define acceptable age ranges
+    enum: ['all','16-20', '21-30', '31-40', '41-50', '51++'], // Define acceptable age ranges
     required: false
   },
   preferredCity: String,

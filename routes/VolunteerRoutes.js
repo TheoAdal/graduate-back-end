@@ -241,10 +241,16 @@ const requests = await AppointmentRequest.find({
     {
       $or: [
         { preferredCity: volunteer.city },
-        { preferredGender: volunteer.gender }
+        { preferredGender: volunteer.gender  },
+        { preferredGender: "all" } // Check for "all" option in gender
       ]
     },
-    { preferredAge: volunteerAgeRange },
+    {
+      $or: [
+        { preferredAge: volunteerAgeRange },
+        { preferredAge: "all" } // Check for "all" option in age
+      ]
+    },
     { status: 'pending' },
     { appointmentDate: { $nin: confirmedAppointmentDates } },
     {appointmentDate: { $gte: currentDateString } } // Only include future dates

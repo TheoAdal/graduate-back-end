@@ -29,7 +29,9 @@ router.get('/getallrequests', async (req, res) => {
 
 router.post("/create", async (req, res) => {
     try {
-      const { oldUserId, appointmentDate } = req.body;
+      const { oldUserId, preferredAge, preferredCity, 
+        appointmentDate, appointmentTime, description, 
+        preferredGender } = req.body;
   
       // Check if the parsed appointmentDate is valid
       const parsedAppointmentDate = new Date(appointmentDate);
