@@ -85,25 +85,28 @@ router.post("/create", async (req, res) => {
 router.patch("/accept/:id", async (req, res) => {
   try {
     const { volunteerId } = req.body; // ID of the volunteer accepting the request
-    const request = await AppointmentRequest.findByIdAndUpdate(
-      req.params.id,
-      {
-        status: "accepted", 
-        acceptedBy: volunteerId,
-      },
-      { new: true }
-    );
+
+    // Find the request first to check its current status
+    const request = await AppointmentRequest.findById(req.params.id);
 
     if (!request) {
       return res.status(404).json({ message: "Request not found" });
     }
 
-    
+    if (request.status === "accepted") {
+      return res.status(400).json({ message: "Request has already been accepted" });
+    }
+
+    // Update the request to accepted status
+    request.status = "accepted";
+    request.acceptedBy = volunteerId;
+    await request.save();
+
     const oldUser = await User.findById(request.oldUserId);
 
     const text = `Your request has been accepted by a volunteer!!!,\n\n
-                  Log into your account to see who accepted it.\n\n`
-		await sendEmail(oldUser.email, "You have an appointment!!!", text);
+                  Log into your account to see who accepted it.\n\n`;
+    await sendEmail(oldUser.email, "You have an appointment!!!", text);
 
     res.status(200).json({ message: "Request accepted", request });
   } catch (error) {

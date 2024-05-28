@@ -15,10 +15,7 @@ const crypto = require("crypto");
 router.patch("/patch/:id", async (req, res) => {
   try {
     // check if user changed his password
-    if (req.body.password) {
-      // hash the new password
-      req.body.password = await bcrypt.hash(req.body.password, 10);
-    }
+    
 
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,

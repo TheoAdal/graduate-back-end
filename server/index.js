@@ -63,7 +63,7 @@ app.post("/login", async (req, res) => {
 
 router.patch("/patch/:id", async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, { 
       new: true,
     });
     if (!user) {
