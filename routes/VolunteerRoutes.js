@@ -72,7 +72,7 @@ router.post("/registervolunteer", async (req, res) => {
       name,
       surname,
       email,
-      mobile,
+      mobile, 
       gender,
       dateofbirth,
       nid,
@@ -225,9 +225,11 @@ router.get('/matching-requests/:volunteerId', async (req, res) => {
 
     // Step 1: Fetch confirmed appointments of the volunteer that have the same dates 
     const confirmedAppointments = await AppointmentRequest.find({
-      volunteerId,
+      acceptedBy: volunteerId,
       status: 'accepted' // Assuming accepted appointments have a status field indicating they are accepted
     }).select('appointmentDate');
+
+    console.log("Confirmed Appointments:", confirmedAppointments);
 
     // Extract appointment dates from confirmed appointments
     const confirmedAppointmentDates = confirmedAppointments.map(appointment => appointment.appointmentDate);
