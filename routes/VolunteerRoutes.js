@@ -229,7 +229,7 @@ router.get('/matching-requests/:volunteerId', async (req, res) => {
       status: 'accepted' // Assuming accepted appointments have a status field indicating they are accepted
     }).select('appointmentDate');
 
-    console.log("Confirmed Appointments:", confirmedAppointments);
+    // console.log("Confirmed Appointments:", confirmedAppointments);
 
     // Extract appointment dates from confirmed appointments
     const confirmedAppointmentDates = confirmedAppointments.map(appointment => appointment.appointmentDate);
@@ -245,7 +245,7 @@ const requests = await AppointmentRequest.find({
     { appointmentDate: { $nin: confirmedAppointmentDates } },
     {appointmentDate: { $gte: currentDateString } }, // Only include future dates
     {
-      $or: [
+      $or: [ 
         { preferredGender: "all" },
         { preferredGender: volunteer.gender }
       ]
