@@ -121,8 +121,8 @@ router.post("/registervolunteer", async (req, res) => {
 			userId: user._id,
 			token: crypto.randomBytes(32).toString("hex"),
 		}).save();                  
-
-		const url = `http://localhost:3000/users/${user._id}/verify/${token.token}`;
+                //http://localhost:3000
+		const url = `https://graduateproject-8f797.web.app/users/${user._id}/verify/${token.token}`;
     const text = `Congragulations, and welcome to the Friendship At All Ages team as a volunteer,\n\n
     only one step remains to activate your account, click the link below to verify your account:
     ${url} \n\n\n`
