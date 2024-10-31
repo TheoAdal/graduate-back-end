@@ -33,7 +33,10 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://localhost:3000", //DELETE THIS
+    origin: [
+      "http://localhost:3000",                       // For local development
+      "https://graduateproject-8f797.web.app",     // Replace with your Firebase domain
+    ],
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
   })
 );
