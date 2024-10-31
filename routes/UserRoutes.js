@@ -81,8 +81,8 @@ router.post("/forgot-password", async (req, res) => {
     }
     
   );
- 
-  const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+                    //http://localhost:3000
+  const resetUrl = `https://graduateproject-8f797.web.app/reset-password/${resetToken}`;
   const text = `
       You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
       Please click on the following link, or paste this into your browser to complete the process:\n\n
@@ -91,8 +91,8 @@ router.post("/forgot-password", async (req, res) => {
   `;
 
   await sendPass({
-    email: user.email,  // Changed from 'email: user.email' to 'to: user.email'
-    resetLink: `http://localhost:3000/reset-password/${resetToken}`,  // Directly use resetLink here
+    email: user.email,  //http://localhost:3000
+    resetLink: `https://graduateproject-8f797.web.app/reset-password/${resetToken}`,  // Directly use resetLink here
     subject: "Password Reset Link",
     text: text,
 });
